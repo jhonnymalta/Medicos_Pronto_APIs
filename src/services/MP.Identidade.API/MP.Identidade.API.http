@@ -1,0 +1,6 @@
+@MP.Identidade.API_HostAddress = http://localhost:5226
+
+GET {{MP.Identidade.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
