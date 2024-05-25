@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MP.Cliente.API.Data;
 using MP.Cliente.API.Interfaces;
+using MP.Cliente.API.MessageConsumer;
 using MP.Cliente.API.Repositories;
 
 
@@ -12,9 +13,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ClienteDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+var conexao = new DbContextOptionsBuilder<ClienteDbContext>();
+conexao.UseSqlServer(connectionString);
 
 // Add services to the container.
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddSingleton(new CriarClienteFromRabbitMQRepository(conexao.Options));
+
+//builder.Services.AddSingleton<ICriarClienteFromRabbitMQRepository, CriarClienteFromRabbitMQRepository>();
+builder.Services.AddHostedService<RabbitMQMessageConsumer>();
 
 builder.Services.AddControllers();
 

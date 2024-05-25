@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MP.Cliente.API.Migrations
 {
     [DbContext(typeof(ClienteDbContext))]
-    [Migration("20240524233438_createClienteMapping")]
-    partial class createClienteMapping
+    [Migration("20240525203935_initialmigration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
