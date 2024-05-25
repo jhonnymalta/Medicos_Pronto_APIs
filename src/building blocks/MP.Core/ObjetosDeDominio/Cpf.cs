@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace MP.Core.ObjetosDeDominio
 {
-    internal class Cpf
+    public class Cpf
     {
         public const int CpfMaxLength = 11;
         public string Numero { get; private set; }
 
-        protected Cfp(){ }
+        protected Cpf(){ }
 
         public Cpf(string numero)
         {
@@ -27,11 +27,12 @@ namespace MP.Core.ObjetosDeDominio
                 cpf = '0' + cpf;
 
             var igual = true;
-            for (int i = 1; i < 11; i++)
+            for (int i = 1; i < 11 && igual; i++)
             {
-                if (cpf[i] != cpf[])
+                if (cpf[i] != cpf[0])
                     igual = false;
             }
+            return true;
         }
 
     }
