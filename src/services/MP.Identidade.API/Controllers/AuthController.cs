@@ -7,6 +7,7 @@ using MP.Core.Integration;
 using MP.Core.ObjetosDeDominio;
 using MP.Identidade.API.Extensions;
 using MP.Identidade.API.Models;
+using MP.Identidade.API.RabbitMQSender;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,16 +21,19 @@ namespace MP.Identidade.API.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AppSetting _appSetting;
-        private IBus _bus;
+        private readonly IRabbitMQMessageSender _rabbitMQSender;
+       
         public AuthController(SignInManager<IdentityUser> signInManager, 
                                 UserManager<IdentityUser> userManager,
                                IOptions<AppSetting> appSetting,
-                               IBus bus)
+                               IRabbitMQMessageSender rabbitMQMessageSender
+                               )
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _appSetting = appSetting.Value;
-            _bus = bus;
+            _rabbitMQSender = rabbitMQMessageSender;
+           
         }
 
 
@@ -47,7 +51,16 @@ namespace MP.Identidade.API.Controllers
             if (result.Succeeded)
             {
                 //integrar com fila do rabbitmq
-                var sucesso = await RegistrarCliente(usuarioRegistro);
+                var criarCliente = new ClienteVo
+                {
+                    Nome = usuarioRegistro.Nome,
+                    Email = usuarioRegistro.Email,
+                    Cpf = new Cpf(usuarioRegistro.Cpf)
+
+                };
+                criarCliente.Nome = usuarioRegistro.Nome;
+
+                _rabbitMQSender.SendMessage(criarCliente, "new-cliente-queue");
                 return CustomResponse(await GerarJwt(usuarioRegistro.Email));
             }
             foreach (var erro in result.Errors)
@@ -132,16 +145,6 @@ namespace MP.Identidade.API.Controllers
         private static long ToUnixEpochDate(DateTime date)
             => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
 
-        private async Task<ResponseMessage> RegistrarCliente(UsuarioRegistro usuarioRegistro)
-        {
-            var usuario = await _userManager.FindByEmailAsync(usuarioRegistro.Email);
-            var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(Guid.Parse(usuario.Id), usuarioRegistro.Nome, usuarioRegistro.Email,
-              usuarioRegistro.Cpf);
-
-            _bus =  RabbitHutch.CreateBus("host=localhost:5672");
-
-           var sucesso = await _bus.Rpc.RequestAsync<UsuarioRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
-            return sucesso;
-        }
+        
     }
 }

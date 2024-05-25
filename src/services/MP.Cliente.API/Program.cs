@@ -3,7 +3,7 @@ using Microsoft.OpenApi.Models;
 using MP.Cliente.API.Data;
 using MP.Cliente.API.Interfaces;
 using MP.Cliente.API.Repositories;
-using MP.Cliente.API.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +15,6 @@ builder.Services.AddDbContext<ClienteDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
-builder.Services.AddHostedService<RegistroClienteIntegrationHandler>();
 
 builder.Services.AddControllers();
 

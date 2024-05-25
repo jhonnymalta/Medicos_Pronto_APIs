@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace MP.Core.Integration
 {
-    public class Event : Message
+    public class BaseMessage
     {
+        public long Id { get; set; }
+        public DateTime MessageCreated { get; set; }
     }
 }

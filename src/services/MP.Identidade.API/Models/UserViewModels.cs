@@ -1,9 +1,10 @@
-﻿using MP.Core.ObjetosDeDominio;
+﻿using MP.Core.Integration;
+using MP.Core.ObjetosDeDominio;
 using System.ComponentModel.DataAnnotations;
 
 namespace MP.Identidade.API.Models
 {
-    public class UsuarioRegistro
+    public class UsuarioRegistro 
     {
         [Required(ErrorMessage = "O campor {0} é obrigatório")]
         public string Nome { get; set; }
